@@ -1,0 +1,55 @@
+.TH SSHTUN-REDIR 1 "2025-10-02" "1.0" "SSHTUN-REDIR Manual"
+.SH NAME
+sshtun-redir \- SSH tunnel redirector utility
+.SH SYNOPSIS
+.B sshtun-redir
+.I <local-port>
+.I <ssh-user-host>
+[
+.I ssh-port
+]
+.SH DESCRIPTION
+.B sshtun-redir
+is a utility designed to run under inetd/xinetd. It manages SSH tunnels by checking if a tunnel is active and refreshing it if necessary. It then redirects traffic from the client to the SSH tunnel.
+.SH OPTIONS
+.TP
+.I <local-port>
+The local port number to which the client connects.
+.TP
+.I <ssh-user-host>
+The SSH user@host string identifying the tunnel.
+.TP
+.I [ssh-port]
+The SSH port number for the tunnel connection. Defaults to 22 if not specified.
+.SH EXAMPLES
+.TP
+.B sshtun-redir 1080 user@example.com
+Starts an SSH tunnel on local port 1080, connecting to user@example.com on the default SSH port (22).
+.TP
+.B sshtun-redir 1080 user@example.com 2222
+Starts an SSH tunnel on local port 1080, connecting to user@example.com on SSH port 2222.
+.SH XINETD CONFIGURATION
+To configure xinetd for sshtun-redir, use the following example to create your xinetd configuration file (e.g., /etc/xinetd.d/sshtun-redir):
+.PP
+.RS
+service sshtun-redir
+{
+    type            = UNLISTED
+    port            = 1080
+    socket_type     = stream
+    protocol        = tcp
+    wait            = no
+    user            = nobody
+    server          = /usr/local/bin/sshtun-redir
+    server_args     = 1080 user@example.com
+    disable         = no
+}
+.RE
+.SH SEE ALSO
+.BR ssh (1),
+.BR inetd (8),
+.BR xinetd (8)
+.SH AUTHOR
+Written by ma5ter.
+.SH BUGS
+Report bugs to the project issue tracker.
